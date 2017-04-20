@@ -20,7 +20,7 @@ RUN pip3 install --no-cache-dir -q --upgrade pip \
  && pip3 install --no-cache-dir -r aaa_manager/requirements.txt \
  && rm -rf ~/.cache/pip/*
  
-RUN python3 db_scripts/create_mongo_user.py
+#RUN python3 db_scripts/create_mongo_user.py
 
 # Run server. gunicorn -u is need for docker-compose (needs unbuffered output)
 CMD python3 setup.py develop && gunicorn --reload --log-level DEBUG --paste development.ini
