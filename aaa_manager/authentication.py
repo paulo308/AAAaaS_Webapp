@@ -30,8 +30,10 @@ APP_KEY = 'app_id'
 USER_ITEM = 'auth'
 SECRET = '4I3+jNeddexZAgvvh6TS47dZVPp5ezPX+sJ1AW/QvwY='
 # expiration is measured in minutes
-TOKEN_EXPIRATION = 30 
+TOKEN_EXPIRATION = 720 
 
+EMAIL = 'auth.eubrabigsea@gmail.com'
+EMAIL_PWD = 'Serverbigsea2017'
 
 class Auth(Enum):
     """ 
@@ -146,7 +148,10 @@ class AuthenticationManager:
             auth_info.
         """
 
-        if self.verify_token(app_id, user_info['token']) != 'invalid token':
+        username = user_info['username']
+        token = user_info['token']
+        usr = self.verify_token(app_id, token)
+        if usr != 'invalid token' and usr == username:
             return self.basedb.remove_list_item(
                     USER_COLLECTION, 
                     APP_KEY, 
@@ -184,7 +189,13 @@ class AuthenticationManager:
             return None, 'users'
         
         email_token = self.generate_token(user_info)
-        result_insert = self.insert_email_token(auth['username'], auth['email'], email_token)
+        LOG.info('email_token: %s' % email_token)
+        LOG.info('auth: %s' % auth)
+        result_insert = self.insert_email_token(
+                auth['username'], 
+                auth['email'], 
+                email_token,
+                False)
         result_email = self.send_email(
                 auth['username'], 
                 user_info['email'], 
@@ -308,31 +319,31 @@ class AuthenticationManager:
                     'created': datetime.datetime.now()
                     })
     
-    def insert_email_token(self, username, email, token):
-        """Insert email token into DB.
-
-        Args:
-            username (str): username;
-            email (str): user email address;
-            token (str): user email token.
-
-        Returns: 
-            obj: mongodb result
-        """
-        return self.basedb.insert('EmailToken', 'email', email, 'data', 
-                {
-                    'token': token, 
-                    'username': username, 
-                    'created': datetime.datetime.now(),
-                    'valid': False
-                    })
 
     def verify_token(self, app_id, token):
         """Verify token validity.
 
         Args:
-            app_id (int): application id
-            token (str): base64 token
+            app_id (int): application id;
+            token (str): base64 token.
+
+        Returns:
+            str: username corresponding to token if valid, 
+            'invalid token' otherwise
+        """
+        result = self.read_user_info(app_id, token)
+        if result != 'invalid token':
+            return result['username']
+        else:
+            return 'invalid token'
+
+
+    def read_user_info(self, app_id, token):
+        """Read user information.
+
+        Args:
+            app_id (int): application id;
+            token (str): base64 token.
 
         Returns:
             str: username corresponding to token if valid, 
@@ -348,7 +359,7 @@ class AuthenticationManager:
                             and (datetime.datetime.now() - datetime.timedelta(minutes=TOKEN_EXPIRATION) < data['created']):
                         LOG.info('#### %s' % (datetime.datetime.now() - datetime.timedelta(minutes=TOKEN_EXPIRATION) < data['created']))
                         LOG.info('#### created: %s' % data['created'])
-                        return data['user']['username']
+                        return data['user']
         return 'invalid token'
 
     def get_token(self, app_id, user):
@@ -522,7 +533,7 @@ class AuthenticationManager:
                  "email" : {
                      "type" : "string",
                      "pattern": "[^@]+@[^@]+\.[^@]+",
-                     }
+                     },
             },
              "required" : ["username", "fname", "lname", "email"]
         }
@@ -532,6 +543,16 @@ class AuthenticationManager:
             LOG.error('Invalid user information')
             raise Exception('Invalid user information') from err 
         return True
+
+    def insert_email_token(self, username, email, token, valid):
+        result = self.basedb.insert('EmailToken', 'email', email, 'data', 
+                {
+                    'token': token, 
+                    'username': username, 
+                    'validated': datetime.datetime.now(),
+                    'valid': valid
+                    })
+        return result
 
     def email_confirmation(self, username, email, token):
         """
@@ -545,19 +566,38 @@ class AuthenticationManager:
         Returns:
             bool: True if valid and False otherwise.
         """
-        
-        self.basedb.insert('EmailToken', 'email', email, 'data', 
-                {
-                    'token': token, 
-                    'username': username, 
-                    'validated': datetime.datetime.now(),
-                    'valid': True
-                    })
-        return True
+        result = False
+        data = self.basedb.get('EmailToken', 'email', email)
+        for item in data:
+            for elem in item['data']:
+                if elem['token'] == token:
+                    new_elem = copy.deepcopy(elem) 
+                    new_elem['valid'] = True
+                    self.basedb.update(
+                            'EmailToken',
+                            'email',
+                            email,
+                            'data',
+                            elem,
+                            new_elem)
+                    result = True
+        return result
+
+    def send_email_token(self, username, email):
+        """
+        Send email with new generated token.
+        """
+        token = self.generate_token(username+email)
+        self.insert_email_token(username, email, token, False)
+        self.send_email(username, email, token)
+        return token
+
+
       
     def verify_email(self, username, email):
         """
         Verifies if given token is valid.
+        TODO: must grant that only the last one is valid.
 
         Args: 
             username (str): username;
@@ -575,40 +615,33 @@ class AuthenticationManager:
                     return True
         return False
 
+
+
     def send_email(self, username, email, token):
-        # me == the sender's email address
-        # you == the recipient's email address
-        msg = MIMEMultipart('alternative')
-        msg['Subject'] = 'email confirmation'
-        msg['From'] = 'bigsea@bigsea.com'
-        msg['To'] = email
-
-        # Create the body of the message (a plain-text and an HTML version).
-        text = "Hi!\nHow are you?\nHere is the link you wanted:\nhttps://www.python.org"
-        html = """\
-        <html>
-          <head></head>
-          <body>
-            <p>Hi!<br>
-               How are you?<br>
-               Here is the <a href="https://www.python.org">link</a> you wanted.
-            </p>
-          </body>
-        </html>
         """
+        Send email with token.
+        """
+        gmail_user = EMAIL
+        gmail_pwd = EMAIL_PWD
+        FROM = EMAIL
+        TO = email
+        CONFIRM_EMAIL_PATH = 'https://eubrabigsea.dei.uc.pt/web/email_confirmation'
+        URL = CONFIRM_EMAIL_PATH + '?username='+username+'&email='+email+'&token='+token
+        SUBJECT = 'EUBRA-BigSea: email confirmation'
+        #TEXT = 'token: ' + token
+        TEXT = 'Click on the following link to confirm the email:\n' + URL 
 
-        # Record the MIME types of both parts - text/plain and text/html.
-        part1 = MIMEText(text, 'plain')
-        part2 = MIMEText(html, 'html')
-
-        # Attach parts into message container.
-        # According to RFC 2046, the last part of a multipart message, in this case
-        # the HTML message, is best and preferred.
-        msg.attach(part1)
-        msg.attach(part2)
-
-        # Send the message via our own SMTP server.
-        #s = smtplib.SMTP('localhost')
-        #s.send_message(msg)
-        #s.quit()
+        message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+        """ % (FROM, TO, SUBJECT, TEXT)
+        try:
+            server = smtplib.SMTP("smtp.gmail.com", 587)
+            server.ehlo()
+            server.starttls()
+            server.login(gmail_user, gmail_pwd)
+            server.sendmail(FROM, TO, message)
+            server.close()
+            LOG.info('successfully sent the mail')
+        except:
+            LOG.info('failed to send mail')
+        
 
