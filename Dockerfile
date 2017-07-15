@@ -22,6 +22,12 @@ RUN pip3 install --no-cache-dir -q --upgrade pip \
  
 #RUN python3 db_scripts/create_mongo_user.py
 
+ENV MESOS_DNS_IP_PORT http://158.42.105.24:8123
+ENV MESOS_DNS_AUTH_DB_ID _db _auth-db-auth._tcp.marathon.mesos
+
 # Run server. gunicorn -u is need for docker-compose (needs unbuffered output)
 CMD python3 setup.py develop && gunicorn --reload --log-level DEBUG --paste development.ini \
-&& python3 db_scripts/create_mongo_user.py
+&& python3 db_scripts/create_mongo_user.py --mesosdns "${MESOS_DNS_IP_PORT}" \
+    --mesosdns_db "${MESOS_DNS_AUTH_DB_ID}" \
+    --vars db_scripts/vars.rc
+
