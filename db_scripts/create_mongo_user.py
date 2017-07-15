@@ -82,9 +82,10 @@ if __name__ == '__main__':
     print("AUTH_DB_HOST PORT: " + ipPort[1])
   
     '''
-    client = MongoClient(ipPort[0], ipPort[1])
-    '''
     client = MongoClient(_DEFAULT_DB_HOST, _DEFAULT_DB_PORT)
+    '''
+   
+    client = MongoClient(ipPort[0], ipPort[1])
     db = client["admin"]
     db.add_user("admin", pwd="tijolo22",
             roles=[{'role':'readWrite', 'db':'AAADB'},
