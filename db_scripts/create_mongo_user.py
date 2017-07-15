@@ -12,47 +12,50 @@ try:
 except ImportError:
     # Fall back to Python 2's urllib2
     from urllib2 import urlopen
-    
-    
+
+
 
 def getIpPortDns(mesosDnsAddr, serviceMesosDns):
-
-'''[
-    {
-    "service": "_auth-db-auth._tcp.marathon.mesos.",
-    "ip": "10.0.0.13",
-    "port": "31332"
-    }
-    ]'''
-response = requests.get(mesosDnsAddr + "/v1/services/" + serviceMesosDns, timeout = 20)
-if response.status_code == requests.codes.ok:
-    #print(response.text)
-    responseJson = json.loads(response.text)
-    ip = responseJson[0]["ip"]
-    port = responseJson[0]["port"]
-    if not ip:
-        print("No ip for " + serviceMesosDns)
-    if not port:
-        print("No port for " + serviceMesosDns)
-else:
-    print("Error getting ip/port for " + serviceMesosDns)
-    ip = ""
-    port = ""
-return (ip, port)
+    
+    '''
+        [
+        {
+        "service": "_auth-db-auth._tcp.marathon.mesos.",
+        "ip": "10.0.0.13",
+        "port": "31332"
+        }
+        ]
+        '''
+    
+    response = requests.get(mesosDnsAddr + "/v1/services/" + serviceMesosDns, timeout = 20)
+    if response.status_code == requests.codes.ok:
+        #print(response.text)
+        responseJson = json.loads(response.text)
+        ip = responseJson[0]["ip"]
+        port = responseJson[0]["port"]
+        if not ip:
+            print("No ip for " + serviceMesosDns)
+        if not port:
+            print("No port for " + serviceMesosDns)
+    else:
+        print("Error getting ip/port for " + serviceMesosDns)
+        ip = ""
+        port = ""
+    return (ip, port)
 
 
 _CODE_CREATE_USER = """
-db.getSiblingDB('$external').runCommand(
-  {
+    db.getSiblingDB('$external').runCommand(
+    {
     createUser: 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR',
     roles: [
-             { role: 'readWrite', db: 'AAADB' },
-             { role: 'read', db: 'AAADB' }
-           ],
+    { role: 'readWrite', db: 'AAADB' },
+    { role: 'read', db: 'AAADB' }
+    ],
     writeConcern: { w: 'majority' , wtimeout: 5000 }
-  }
-)
-"""
+    }
+    )
+    """
 
 
 _DEFAULT_DB_HOST = 'mongo'
@@ -64,7 +67,7 @@ _DEFAULT_USER = 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR'
 _DEFAULT_MECHANISM = 'MONGODB-X509'
 
 if __name__ == '__main__':
-  
+    
     print("Running the Mesos DNS ip/port extractor")
     parser = argparse.ArgumentParser(description="Get the ip/port for various services from Mesos DNS")
     parser.add_argument('--mesosdns', required=True, help='Mesos DNS full address e.g. http://127.0.0.1:8123')
@@ -75,20 +78,21 @@ if __name__ == '__main__':
     varsFName = args.vars
     mesosDnsAddr = args.mesosdns
     mesosDnsDb = args.mesosdns_db
-  
-
+    
+    
     ipPort = getIpPortDns(mesosDnsAddr, mesosDnsDb)
     print("AUTH_DB_HOST IP: " + ipPort[0])
     print("AUTH_DB_HOST PORT: " + ipPort[1])
-  
+    
     '''
-    client = MongoClient(_DEFAULT_DB_HOST, _DEFAULT_DB_PORT)
-    '''
-   
+        client = MongoClient(_DEFAULT_DB_HOST, _DEFAULT_DB_PORT)
+        '''
+    
     client = MongoClient(ipPort[0], ipPort[1])
     db = client["admin"]
     db.add_user("admin", pwd="tijolo22",
-            roles=[{'role':'readWrite', 'db':'AAADB'},
-                   {'role':'userAdminAnyDatabase', 'db': 'admin'}])
+                roles=[{'role':'readWrite', 'db':'AAADB'},
+                       {'role':'userAdminAnyDatabase', 'db': 'admin'}])
     db.authenticate("admin", "tijolo22")
     db.eval(_CODE_CREATE_USER)
+
