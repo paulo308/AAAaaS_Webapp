@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 
 # Installing needed packages
 RUN apk add --update --no-cache python3 \
- && apk add --update --no-cache --virtual .build-deps gcc libc-dev python3 python3-dev bash
+ && apk add --update --no-cache --virtual .build-deps gcc libc-dev python3 python3-dev bash nano
 
 RUN apk update && apk add build-base libffi-dev
 
