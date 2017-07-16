@@ -31,5 +31,6 @@ ENV MESOS_DNS_AUTH_DB_ID _auth-db-auth._tcp.marathon.mesos
 CMD python3 setup.py develop && gunicorn --reload --log-level DEBUG --paste development.ini \
 && python3 db_scripts/create_mongo_user.py --mesosdns "${MESOS_DNS_IP_PORT}" \
     --mesosdns_db "${MESOS_DNS_AUTH_DB_ID}" \
-    --vars db_scripts/vars.rc
+    --vars db_scripts/vars.rc /
+&& export $(cat db_scripts/vars.rc)
 
