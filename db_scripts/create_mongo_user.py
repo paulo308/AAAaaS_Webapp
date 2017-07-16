@@ -80,9 +80,14 @@ if __name__ == '__main__':
     mesosDnsDb = args.mesosdns_db
     
     
-    ipPort = getIpPortDns(mesosDnsAddr, mesosDnsDb)
-    print("AUTH_DB_HOST IP: " + ipPort[0])
-    print("AUTH_DB_HOST PORT: " + ipPort[1])
+    with open(varsFName, "w") as varsF:
+        ipPort = getIpPortDns(mesosDnsAddr, mesosDnsDb)
+        print("AUTH_DB_HOST IP: " + ipPort[0])
+        print("AUTH_DB_HOST PORT: " + ipPort[1])
+        varsF.write("AUTH_DB_HOST=" + ipPort[0] + "\n")
+        varsF.write("AUTH_DB_PORT=" + ipPort[1] + "\n")
+    
+    
     
     '''
         client = MongoClient(_DEFAULT_DB_HOST, _DEFAULT_DB_PORT)
