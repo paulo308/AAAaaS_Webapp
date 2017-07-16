@@ -13,6 +13,7 @@ from enum import Enum
 from aaa_manager.basedb import BaseDB
 import bcrypt
 import base64
+import os
 
 # Import smtplib for the actual sending function
 import smtplib
@@ -22,8 +23,11 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 LOG = logging.getLogger(__name__)
-_DEFAULT_DB_HOST = 'mongo'
-_DEFAULT_DB_PORT = 27017
+# _DEFAULT_DB_HOST = 'mongo'
+_DEFAULT_DB_HOST = "AUTH_DB_HOST" in os.environ
+#_DEFAULT_DB_PORT = 27017
+_DEFAULT_DB_PORT = "AUTH_DB_PORT" in os.environ
+
 
 USER_COLLECTION = 'users'
 APP_KEY = 'app_id'
