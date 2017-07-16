@@ -22,8 +22,8 @@ RUN pip3 install --no-cache-dir -q --upgrade pip \
  
 #RUN python3 db_scripts/create_mongo_user.py
 
-ENV AUTH_DB_PORT 5432
-ENV AUTH_DB_HOST localhost
+ENV AUTH_DB_PORT 44802
+ENV AUTH_DB_HOST 10.0.0.7
 ENV MESOS_DNS_IP_PORT http://158.42.105.24:8123
 ENV MESOS_DNS_AUTH_DB_ID _auth-db-auth._tcp.marathon.mesos
 
