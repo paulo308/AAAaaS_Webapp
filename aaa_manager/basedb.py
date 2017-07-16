@@ -9,11 +9,14 @@ from aaa_manager.db_client import DBClient
 
 LOG = logging.getLogger(__name__)
 
-# _DEFAULT_DB_HOST = 'mongo'
-_DEFAULT_DB_HOST = "AUTH_DB_HOST" in os.environ
-#_DEFAULT_DB_PORT = 27017
-_DEFAULT_DB_PORT = "AUTH_DB_PORT" in os.environ
+#_DEFAULT_DB_HOST = "AUTH_DB_HOST" in os.environ
+_DEFAULT_DB_HOST = os.environ.get("AUTH_DB_HOST", "mongo")
+#_DEFAULT_DB_PORT = "AUTH_DB_PORT" in os.environ
+_DEFAULT_DB_PORT = int(os.environ.get("AUTH_DB_PORT", 27017))
 _DEFAULT_DB_NAME = 'AAADB'
+
+
+
 
 class BaseDB:
     """ 
