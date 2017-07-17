@@ -1,5 +1,0 @@
-
-class DBError(BaseException):
-    pass
-
-
