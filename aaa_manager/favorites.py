@@ -3,25 +3,21 @@ Email class is responsible for managing favorite information associated to a
 certain user, which will be identified by username.
 
 """
-from aaa_manager.authentication import AuthenticationManager 
-from aaa_manager.authentication import _DEFAULT_DB_HOST, _DEFAULT_DB_PORT
 from aaa_manager.basedb import BaseDB
+from aaa_manager.token import Token
 from jsonschema import validate, ValidationError
 import logging
 
 
 LOG = logging.getLogger(__name__)
-FAVORITE_COLLECTION = 'Authorisation'
+FAVORITE_COLLECTION = 'Favorites'
 FAVORITE_KEY = 'username'
 FAVORITE_ITEM = 'favorites'
 
 class Favorites:
 
-    def __init__(self, host=_DEFAULT_DB_HOST, port=_DEFAULT_DB_PORT):
-        self.host = host
-        self.port = port
-        self.basedb = BaseDB(host, port)
-        self.auth = AuthenticationManager()
+    def __init__(self):
+        self.basedb = BaseDB()
 
     def create(self, app_id, username, item_id, item_type, city_id, country_id, favorite_id, data, token):
         """
@@ -40,27 +36,22 @@ class Favorites:
         Returns:
             database response
         """
-        LOG.info('#### ok1')
-        if self.auth.verify_token(app_id, token) != 'invalid token':
-            LOG.info('#### ok2')
-            item = {
-                    'item_id': item_id,
-                    'item_type': item_type,
-                    'city_id': city_id,
-                    'country_id': country_id,
-                    'favorite_id': favorite_id,
-                    'data': data,
-                    'token': token,
-                    }
-            LOG.info('#### ok3')
-            if self.validate_favorite(item):
-                LOG.info('#### ok4')
-                return self.basedb.insert(
-                        FAVORITE_COLLECTION,
-                        FAVORITE_KEY,
-                        username,
-                        FAVORITE_ITEM,
-                        item)
+        item = {
+                'item_id': item_id,
+                'item_type': item_type,
+                'city_id': city_id,
+                'country_id': country_id,
+                'favorite_id': favorite_id,
+                'data': data,
+                'token': token,
+                }
+        if self.validate_favorite(item):
+            return self.basedb.insert(
+                    FAVORITE_COLLECTION,
+                    FAVORITE_KEY,
+                    username,
+                    FAVORITE_ITEM,
+                    item)
         return None
 
     def read(self, app_id, username, city_id, country_id, token):
@@ -74,17 +65,36 @@ class Favorites:
             token (str): token.
             
         """
-        if self.auth.verify_token(app_id, token) != 'invalid token':
-            result = self.basedb.get(
-                    FAVORITE_COLLECTION, 
-                    FAVORITE_KEY,
-                    username)
-            for item in result:
-                for elem in item['favorites']:
-                    if elem['city_id'] == city_id and\
-                            elem['country_id'] == country_id:
-                        return elem
+        result = self.basedb.get(
+                FAVORITE_COLLECTION, 
+                FAVORITE_KEY,
+                username)
+        for item in result:
+            for elem in item['favorites']:
+                if elem['city_id'] == city_id and\
+                        elem['country_id'] == country_id:
+                    return elem
         return None
+    
+    def read_all(self, app_id, username):
+        """
+        Read favorites information for username. 
+
+        Args: 
+            username (str): username;
+            city_id (dict): city_id (external);
+            ccountry_id (dict): country_id (external);
+            token (str): token.
+            
+        """
+        result = self.basedb.get(
+                FAVORITE_COLLECTION, 
+                FAVORITE_KEY,
+                username)
+        res = list(result)
+        for item in res:
+            del item['_id']
+        return res
 
     def update(self, username, item_id):
         pass
@@ -99,21 +109,20 @@ class Favorites:
             token (str): token.
 
         """
-        if self.auth.verify_token(app_id, token) != 'invalid token':
-            result = self.basedb.get(
-                    FAVORITE_COLLECTION, 
-                    FAVORITE_KEY,
-                    username)
-            for item in result:
-                for elem in item['favorites']:
-                    if elem['item_id'] == item_id:
-                        r = self.basedb.remove_list_item(
-                                FAVORITE_COLLECTION, 
-                                FAVORITE_KEY, 
-                                username, 
-                                FAVORITE_ITEM, 
-                                elem)
-                        return r
+        result = self.basedb.get(
+                FAVORITE_COLLECTION, 
+                FAVORITE_KEY,
+                username)
+        for item in result:
+            for elem in item['favorites']:
+                if elem['item_id'] == item_id:
+                    r = self.basedb.remove_list_item(
+                            FAVORITE_COLLECTION, 
+                            FAVORITE_KEY, 
+                            username, 
+                            FAVORITE_ITEM, 
+                            elem)
+                    return r
         return None
 
     

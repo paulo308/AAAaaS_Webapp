@@ -4,6 +4,7 @@ This file contains the Authorisation REST interface.
 import logging
 
 from aaa_manager import Route
+from aaa_manager.token import Token
 from aaa_manager.authorisation import Authorisation
 from aaa_manager.authentication import AuthenticationManager
 from pyramid.view import view_config
@@ -23,6 +24,7 @@ class AuthorisationRestView:
         self._data = self._settings['data']
         self.authorisation = Authorisation()
         self.authentication = AuthenticationManager()
+        self.token = Token()
 
     @view_config(route_name=Route.CREATE_AUTHORISATION,
                  request_method='POST',
@@ -46,15 +48,15 @@ class AuthorisationRestView:
         msg = ''
         try:
             username = self.request.params['username']
-            resource_type = self.request.params['resource_type']
+            resource_category = self.request.params['resource_category']
             resource_name = self.request.params['resource_name']
             max_used = self.request.params['max']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auth = self.authorisation.create(
                         username, 
-                        resource_type, 
+                        resource_category, 
                         resource_name, 
                         max_used)
                 if auth is not None:
@@ -65,8 +67,10 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
             
@@ -95,7 +99,7 @@ class AuthorisationRestView:
             resource_name = self.request.params['resource_name']
             resource_category = self.request.params['resource_category']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auth = self.authorisation.use_resource(
                         username, 
@@ -109,8 +113,10 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
     
@@ -141,7 +147,7 @@ class AuthorisationRestView:
             resource_name = self.request.params['resource_name']
             resource_category = self.request.params['resource_category']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auth = self.authorisation.read(
                         username, 
@@ -155,8 +161,10 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
     
@@ -181,7 +189,7 @@ class AuthorisationRestView:
         try:
             username = self.request.params['username']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auths = self.authorisation.read_authorisations(username)
                 if auths is not None:
@@ -193,8 +201,10 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
 
@@ -226,7 +236,7 @@ class AuthorisationRestView:
             resource_category = self.request.params['resource_category']
             max_allowed = self.request.params['max_allowed']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auth = self.authorisation.update(
                         username, 
@@ -241,8 +251,10 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
             
@@ -271,7 +283,7 @@ class AuthorisationRestView:
             resource_category = self.request.params['resource_category']
             max_allowed = self.request.params['max_allowed']
             token = self.request.params['token']
-            usr = self.authentication.verify_token(2, token)
+            usr = self.token.verify_token(2, token)
             if usr != 'invalid token' and usr == username:
                 auth = self.authorisation.delete(
                         username, 
@@ -285,7 +297,9 @@ class AuthorisationRestView:
                 return {'error': 'Invalid token'}
         except KeyError as e:
             msg = 'Missing mandatory parameter: ' + str(e)
+            raise e
         except Exception as e:
             msg = 'Unknown error occurred: ' + str(e)
+            raise e
         LOG.info(msg)
         return {'error': msg}
