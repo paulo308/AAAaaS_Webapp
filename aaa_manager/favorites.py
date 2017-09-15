@@ -136,7 +136,7 @@ class Favorites:
                         'city_id': {'type': 'number'},
                         'country_id': {'type': 'number'},
                         'favorite_id': {'type': 'string', 'maxLength': 4000},
-                        'data': {'type': 'string', 'maxLength': 10000},
+                        'data': {'type': 'string', 'maxLength': 100000},
                     },
                     'required' : ['item_id', 'item_type', 'city_id', 'country_id', 'favorite_id', 'data']
                 }
