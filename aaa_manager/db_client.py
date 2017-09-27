@@ -19,7 +19,7 @@ _DEFAULT_DB_NAME = 'AAADB'
 _DEFAULT_CLIENT_CERT = 'certs/mongo_client_crt.pem'
 _DEFAULT_CA_CERT = 'certs/root_ca.pem'
 _DEFAULT_USER = 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR'
-_DEFAULT_MECHANISM = 'MONGODB-X509'
+"""_DEFAULT_MECHANISM = 'MONGODB-X509'"""
 
 
 class DBClient:
@@ -57,7 +57,7 @@ class DBClient:
         """
         self.name = name
         self.db = self.client[name]
-        self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)
+        """self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)"""
 
     def insert(self, collection, data):
         """
