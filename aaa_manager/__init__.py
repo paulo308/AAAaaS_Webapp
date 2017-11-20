@@ -81,6 +81,9 @@ def main(global_config, **settings):
     config.add_route(Route.READ_ACCOUNTING, '/engine/api/read_accounting')
     config.add_route(Route.CHECKIN_DATA_INFRA, '/engine/api/checkin_data_infra')
     config.add_route(Route.INSERT_DATA_INFRA, '/engine/api/insert_data_infra')
+    
+    dbhost = os.path.expandvars(settings.get('dbhost'))
+    dbport = os.path.expandvars(settings.get('dbport'))
 
     LOG.info("AAA module initiated.")
     # Scan and load classes with configuration decoration (@view_config)
