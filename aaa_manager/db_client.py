@@ -19,7 +19,7 @@ LOG = logging.getLogger(__name__)
 _DEFAULT_DB_PORT = 27017"""
 
 _DEFAULT_DB_HOST = os.getenv('AUTH_DB_HOST')
-_DEFAULT_DB_PORT = os.getenv('AUTH_DB_PORT')
+_DEFAULT_DB_PORT = int(os.getenv('AUTH_DB_PORT'))
 
 """_DEFAULT_DB_HOST = dbhost
 _DEFAULT_DB_PORT = dbport"""
