@@ -12,6 +12,9 @@ RUN apk add --update --no-cache python3 \
 
 RUN apk update && apk add build-base libffi-dev
 
+ENV AUTH_DB_PORT 0
+ENV AUTH_DB_HOST server
+
 EXPOSE 9000
 
 # Install requirements
