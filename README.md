@@ -27,7 +27,6 @@ Example:
           "value": "AUTH_DB_HOST=10.20.30.40"
         }`
         
-       
 
 # DockerNetwork branch
 
@@ -44,3 +43,6 @@ Note that it is necessary to deploy the remaing containers of the AAA service to
 * Database (https://github.com/paulo308/AAAaaS_Mongodb)
 
 Obs: this version of the application connects to the Database without certificates. If you do not own the infrastrucutre where the services are deployed or it does not meet your security standards, it is advisable to connect to database using certificates please refere to branch: DockerNetworkSSL_DB (https://github.com/paulo308/AAAaaS_Webapp/tree/dockerNetworkSSL_DB)
+
+ Please note that if you choose to use this versions, you should manually modify the configuration files provided before deployment and building Docker images. Namelly, Nginx configuration file for domain, ports and certificates location and Web App for email domain and database IP and Port.
+
