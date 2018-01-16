@@ -5,6 +5,7 @@ certain user, which will be identified by username.
 """
 from aaa_manager.basedb import BaseDB
 from aaa_manager.token import Token
+from aaa_manager.authorisation import Authorisation
 from jsonschema import validate, ValidationError
 import logging
 
@@ -18,6 +19,15 @@ class Favorites:
 
     def __init__(self):
         self.basedb = BaseDB()
+
+
+    def insert_default(self, username):
+        """
+        Insert default authorisation for Favorites.
+        """
+
+        authorisation = Authorisation()
+        return authorisation.create(username, 'Software', 'Favorites', 10)
 
     def create(self, app_id, username, item_id, item_type, city_id, country_id, favorite_id, data, token):
         """
@@ -136,7 +146,7 @@ class Favorites:
                         'city_id': {'type': 'number'},
                         'country_id': {'type': 'number'},
                         'favorite_id': {'type': 'string', 'maxLength': 4000},
-                        'data': {'type': 'string', 'maxLength': 100000},
+                        'data': {'type': 'string', 'maxLength': 10000},
                     },
                     'required' : ['item_id', 'item_type', 'city_id', 'country_id', 'favorite_id', 'data']
                 }
