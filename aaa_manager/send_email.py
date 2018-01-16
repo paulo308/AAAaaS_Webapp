@@ -3,6 +3,8 @@ import logging
 # Import smtplib for the actual sending function
 import smtplib
 
+import os
+
 # Import the email modules we'll need
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -11,6 +13,8 @@ LOG = logging.getLogger(__name__)
 
 EMAIL = 'auth.eubrabigsea@gmail.com'
 EMAIL_PWD = 'Serverbigsea2017'
+
+DOMAIN_NAME_FOR_EMAIL_USE = os.getenv('DOMAIN_NAME')
 
 class SendEmail:
 
@@ -42,8 +46,9 @@ class SendEmail:
         """
         Send email with token.
         """
-        CONFIRM_EMAIL_PATH = 'https://eubrabigsea.dei.uc.pt/web/email_confirmation'
+        #CONFIRM_EMAIL_PATH = 'https://eubrabigsea.dei.uc.pt/web/email_confirmation'
         #CONFIRM_EMAIL_PATH = 'http://localhost:9000/web/email_confirmation'
+        CONFIRM_EMAIL_PATH = DOMAIN_NAME_FOR_EMAIL_USE + '/web/email_confirmation'
         URL = CONFIRM_EMAIL_PATH + '?username='+username+'&email='+email+'&token='+token
         SUBJECT = 'EUBRA-BigSea: email confirmation'
         TEXT = 'Click on the following link to confirm the email:\n' + URL 
