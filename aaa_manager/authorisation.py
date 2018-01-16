@@ -35,16 +35,21 @@ class Authorisation:
         """
         Returns True if username is allowed to access resource.
         """
-        resources = list(self.basedb.get(AUTHORISATION_COLLECTION, 
+        resources = self.basedb.get(AUTHORISATION_COLLECTION, 
                 AUTHORISATION_KEY,
-                username))
+                username)
+        maximum = -1
+        maxelem = None
         for item in resources:
             for elem in item['resource_rule']:
                 LOG.info('elem: %s' % elem)
                 if elem['resource_name'] == resource_name and\
                     elem['resource_category'] == resource_category:
-                        return True
-        return False
+                        if maximum < elem['used']:
+                            maximum = elem['used']
+                            maxelem = elem
+            return True, maxelem
+        return False, elem
     
     def update_resource_item(self, username, resource_name, resource_category):
         """
@@ -58,14 +63,30 @@ class Authorisation:
                 LOG.info('elem: %s' % elem)
                 if elem['resource_name'] == resource_name and\
                         elem['resource_category'] == resource_category:
+                    LOG.info('entrou')
                     old_item = copy.deepcopy(item)
                     elem['used']= elem['used'] + 1
-                    res = self.basedb.update(AUTHORISATION_COLLECTION, 
+                    LOG.info('elem2: %s' % elem)
+                    res = self.basedb.remove_list_item(AUTHORISATION_COLLECTION,
+                            AUTHORISATION_KEY,
+                            username,
+                            AUTHORISATION_ITEM,
+                            old_item)
+                    LOG.info('res: %s' % res)
+                    res = self.basedb.insert(AUTHORISATION_COLLECTION,
+                            AUTHORISATION_KEY,
+                            username,
+                            AUTHORISATION_ITEM,
+                            elem)
+                    LOG.info('res: %s' % res)
+
+                    """res = self.basedb.update(AUTHORISATION_COLLECTION, 
                             AUTHORISATION_KEY,
                             username, 
                             AUTHORISATION_ITEM,
                             old_item,
                             item)
+                    LOG.info('res: %s' % res)"""
         return res
 
 
@@ -75,7 +96,8 @@ class Authorisation:
         is responsible for triggering the accounting mechanism and updating the
         database to increment the number of times that resource was used. 
         """
-        if self.verify(username, resource_name, resource_category):
+        result, elem = self.verify(username, resource_name, resource_category)
+        if result and elem['used'] + 1 <= elem['max_used']:
             # add 1 to used field
             self.update_resource_item(username, resource_name, resource_category)
             # account it  
@@ -83,8 +105,8 @@ class Authorisation:
             LOG.info('msg: %s' % msg)
             category = INFO
             self.accounting.register(username, msg, category)
-            return {'msg': msg}
-        return None
+            return {'msg': msg}, elem['max_used']
+        return None, elem['max_used']
 
 
 
