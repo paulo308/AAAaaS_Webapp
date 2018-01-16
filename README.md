@@ -1,36 +1,44 @@
-AAA as a Service - Central Server Module
-============================
+## AAAaaS_Webapplication
 
-The work presented here is the development of a module of Authentication, Authorisation and Accounting as a Service for the BIGSEA Project. This repository represents the usage of a central AAA Server serving developers and applications in need of the service.
+AAAaaS Websapp is a RESTful application that provides authentication, authorisation and accounting. The service is offered in a Graphical User Interface (GUI) and a REST API. It connects to the Web Server of the AAA service and ensures secure communications by using SSL certificates. It also connects to the Database of the AAA service.
 
-![EUBRABIGSEA logo](docs/static_files/EUBRABIGSEA-logo.png "EUBRA BIGSEA")
-
-## Disclaimer 
-
-This repository is intended for development and testing purposes. The configurations currently available will only work with a specific DNS (eubrabigsea.dei.uc.pt). Additional configurations like localhost usage and specific DNS will be made available soon.
-
-## Installation instructions
+In this repository it is possible to find two ways of deployment using Docker containers. One way recurring to Marathon and another as standalone. Both ways demand a consequent deployment of the complementary services: web server and database).
 
 
+Docker Hub link (for built images):
+https://hub.docker.com/r/paulo308/aaaaas_webapp/
 
-First you need to give the proper permissions to "start.sh" script:
+# Master (or envVar) branch 
 
-```bash
-chmod +x start.sh
-```
+It is to be used with Marathon. The JSON file inserted in marathon to launch the container must contain the database's IP address and port, and the domain name where the service is to be deployed. The latter is necessary to configure the application's email settings (to create account, reset password, etc). 
 
-After that, you can run the script which will delete all the docker containers in the system and make a clean install. Make sure you setup a proper enviroment for not to lose any previously created docker containers.
+Example: 
+`"parameters": [
+        {
+          "key": "env",
+          "value": "DOMAIN_NAME=http://exampledomain:1234"
+        },
+        {
+          "key": "env",
+          "value": "AUTH_DB_PORT=12345"
+        },
+        {
+          "key": "env",
+          "value": "AUTH_DB_HOST=10.20.30.40"
+        }`
+        
+       
 
-Run the script:
+# DockerNetwork branch
 
-```bash
-./start.sh
-```
+It is to be used when manual container deployment is made. It is pre-configured to be used with a custom Docker Network described in the documentation.
 
-Wait while it gathers the necessary images and configures the containers. After a successfull initiation, the service should be up and running! 
+In this case, the user neeeds to create a Docker network (if not created yet) such as the following example:
+`docker network create --driver=bridge --subnet=172.250.0.0/24 --gateway=172.250.0.1 aaanet`
 
-## Usage Examples - Rest API Calls
+Next, it is necessary to launch the container attached to the previously created network with the tag "dockerNetwork":
+`docker run --name webapp --ip=172.250.0.85 --net=aaanet -p 9000:9000 -ti paulo308/aaaaas_webapp:dockerNetwork`
 
-Following there are examples of call to the AAA Server API. Additionally, you can consult the document with further instructions at /docs/AAAaaServiceDetails.pdf
-
-To be added soon...
+Note that it is necessary to deploy the remaing containers of the AAA service to complete instalation. Please refer to the following repositories:
+* Web Server (https://github.com/paulo308/AAAaaS_Webserver)
+* Database (https://github.com/paulo308/AAAaaS_Mongodb)
