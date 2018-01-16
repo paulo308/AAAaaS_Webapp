@@ -16,6 +16,7 @@ from aaa_manager.emails import Emails
 from aaa_manager.email_token import EmailToken
 from aaa_manager.send_email import SendEmail
 from aaa_manager.token import Token
+from aaa_manager.favorites import Favorites
 import bcrypt
 import base64
 
@@ -46,6 +47,7 @@ class AuthenticationManager:
         self.emailToken = EmailToken()
         self.sendEmail = SendEmail() 
         self.token = Token()
+        self.favorites = Favorites()
 
     def _format_user_dict(self, user):
         return {
@@ -176,7 +178,6 @@ class AuthenticationManager:
         if not self.emails.is_email_unique(user_info['email']):
             return None, 'invalid email'
 
-        users = self.basedb.get(USER_COLLECTION, APP_KEY, app_id)
         if user_info['username'] == 'admin':
             return None, 'admin'
         auth = copy.deepcopy(user_info)
@@ -186,6 +187,8 @@ class AuthenticationManager:
 
         LOG.info('auth: %s' % auth)
         result_email = self.emailToken.send_email_token(auth['username'], auth['email'])
+
+        result_fav = self.favorites.insert_default(auth['username'])
 
         return self.basedb.insert(USER_COLLECTION, APP_KEY, app_id,
                                         USER_ITEM, auth), ''
