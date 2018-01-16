@@ -5,6 +5,7 @@ for establishing connections with MongoDB.
 """
 import logging
 import ssl
+import os
 
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
@@ -13,13 +14,21 @@ from aaa_manager.exceptions import DBError
 
 LOG = logging.getLogger(__name__)
 
-_DEFAULT_DB_HOST = 'mongo'
-_DEFAULT_DB_PORT = 27017
+
+"""_DEFAULT_DB_HOST = 'mongo'
+_DEFAULT_DB_PORT = 27017"""
+
+_DEFAULT_DB_HOST = os.getenv('AUTH_DB_HOST')
+_DEFAULT_DB_PORT = int(os.getenv('AUTH_DB_PORT'))
+
+"""_DEFAULT_DB_HOST = dbhost
+_DEFAULT_DB_PORT = dbport"""
+
 _DEFAULT_DB_NAME = 'AAADB'
 _DEFAULT_CLIENT_CERT = 'certs/mongo_client_crt.pem'
 _DEFAULT_CA_CERT = 'certs/root_ca.pem'
 _DEFAULT_USER = 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR'
-_DEFAULT_MECHANISM = 'MONGODB-X509'
+"""_DEFAULT_MECHANISM = 'MONGODB-X509'"""
 
 
 class DBClient:
@@ -39,15 +48,15 @@ class DBClient:
         Connects to MongoDB.
         """
         try:
-            self.client = MongoClient(self.host,
+            """self.client = MongoClient(self.host,
                                       self.port,
                                       ssl=True,
                                       ssl_certfile=_DEFAULT_CLIENT_CERT,
                                       ssl_cert_reqs=ssl.CERT_REQUIRED,
-                                      ssl_ca_certs=_DEFAULT_CA_CERT)
-            """self.client = MongoClient(self.host,
+                                      ssl_ca_certs=_DEFAULT_CA_CERT)"""
+            self.client = MongoClient(self.host,
                                       self.port,
-                                      ssl=False)"""
+                                      ssl=False)
         except ConnectionFailure as e:
             raise DBError("Can't connect to database.") from e
 
@@ -57,7 +66,7 @@ class DBClient:
         """
         self.name = name
         self.db = self.client[name]
-        self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)
+        """self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)"""
 
     def insert(self, collection, data):
         """
