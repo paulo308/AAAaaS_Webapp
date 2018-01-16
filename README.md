@@ -42,3 +42,5 @@ Next, it is necessary to launch the container attached to the previously created
 Note that it is necessary to deploy the remaing containers of the AAA service to complete instalation. Please refer to the following repositories:
 * Web Server (https://github.com/paulo308/AAAaaS_Webserver)
 * Database (https://github.com/paulo308/AAAaaS_Mongodb)
+
+Obs: this version of the application connects to the Database with certificates. If you must connect to database using certificates please refere to branch: DockerNetworkSSL_DB (https://github.com/paulo308/AAAaaS_Webapp/tree/dockerNetworkSSL_DB)
