@@ -2,7 +2,7 @@ from pymongo import MongoClient
 
 import os
 
-_CODE_CREATE_USER = """
+_CODE_CREATE_USER = 
 db.getSiblingDB('$external').runCommand(
   {
     createUser: 'OU=mongo_client,O=BIGSEA,L=Coimbra,ST=CB,C=PT',
@@ -13,7 +13,6 @@ db.getSiblingDB('$external').runCommand(
     writeConcern: { w: 'majority' , wtimeout: 5000 }
   }
 )
-"""
 
 
 PWD="H1DiZeMWdU4UmA=="
