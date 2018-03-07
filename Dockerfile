@@ -3,6 +3,7 @@ FROM alpine:3.4
 
 
 COPY ./ /usr/src/app
+COPY ./certs /certs
 
 WORKDIR /usr/src/app
 
