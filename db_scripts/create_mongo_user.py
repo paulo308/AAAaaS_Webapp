@@ -5,7 +5,7 @@ import os
 _CODE_CREATE_USER = """
 db.getSiblingDB('$external').runCommand(
   {
-    createUser: 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR',
+    createUser: 'OU=mongo_client,O=BIGSEA,L=Coimbra,ST=CB,C=PT',
     roles: [
              { role: 'readWrite', db: 'AAADB' },
              { role: 'read', db: 'AAADB' }
@@ -29,7 +29,7 @@ _DEFAULT_DB_PORT = dbport"""
 _DEFAULT_DB_NAME = 'AAADB'
 _DEFAULT_CLIENT_CERT = 'certs/mongo_client_crt.pem'
 _DEFAULT_CA_CERT = 'certs/root_ca.pem'
-_DEFAULT_USER = 'OU=mongo_client,O=Bigsea,L=Campinas,ST=SP,C=BR'
+_DEFAULT_USER = 'OU=mongo_client,O=BIGSEA,L=Coimbra,ST=CB,C=PT'
 _DEFAULT_MECHANISM = 'MONGODB-X509'
 
 if __name__ == '__main__':
