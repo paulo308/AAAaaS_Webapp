@@ -1,6 +1,8 @@
 {
     "hosts": [
-        "localhost"
+        "localhost",
+        "bsserver",
+        "10.0.0.21"
     ],
     "key": {
         "algo": "rsa",
