@@ -8,10 +8,10 @@
     },
     "names": [
         {
-            "C": "BR",
-            "ST": "SP",
-            "L": "Campinas",
-            "O": "Bigsea",
+            "C": "PT",
+            "ST": "CB",
+            "L": "Coimbra",
+            "O": "BIGSEA",
             "OU": "mongo"
         }
     ]
