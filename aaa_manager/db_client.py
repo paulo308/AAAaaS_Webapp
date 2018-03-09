@@ -66,7 +66,7 @@ class DBClient:
         """
         self.name = name
         self.db = self.client[name]
-        self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)
+        """self.db.authenticate(_DEFAULT_USER, mechanism=_DEFAULT_MECHANISM)"""
 
     def insert(self, collection, data):
         """
