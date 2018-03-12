@@ -1,8 +1,8 @@
 {
     "hosts": [
         "localhost",
-        "bsserver",
-        "10.0.0.21"
+        "10.0.0.21",
+        "client"
     ],
     "key": {
         "algo": "rsa",
@@ -13,7 +13,7 @@
             "C": "PT",
             "ST": "CB",
             "L": "Coimbra",
-            "O": "BIGSEA",
+            "O": "BIGSEA_client",
             "OU": "mongo_client"
         }
     ]

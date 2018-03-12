@@ -2,15 +2,15 @@
 
 initca() {
     ## Generate root certificate 
-    cfssl genkey -initca root_ca.json | cfssljson -bare root_ca
+    /Users/paulosilva/go/bin/cfssl genkey -initca root_ca.json | /Users/paulosilva/go/bin/cfssljson -bare root_ca
 }
 
 mongo() {
     ## Generate mongo certificate using the root
-    cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem -hostname=mongo,localhost mongo_csr.json | cfssljson -bare mongo
+     /Users/paulosilva/go/bin/cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem -hostname=bsserver,10.0.0.21 mongo_csr.json |  /Users/paulosilva/go/bin/cfssljson -bare mongo
     cat mongo-key.pem mongo.pem > mongo_crt.pem
     ## Generate mongo_client certificate using the CA
-    cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem -hostname=mongo,localhost mongo_client_csr.json | cfssljson -bare mongo_client
+     /Users/paulosilva/go/bin/cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem -hostname=bsserver,10.0.0.21 mongo_client_csr.json |  /Users/paulosilva/go/bin/cfssljson -bare mongo_client
     cat mongo_client-key.pem mongo_client.pem > mongo_client_crt.pem
 }
 
@@ -18,7 +18,7 @@ mongo() {
 
 web() {
     ## Generate demo web client using the root (must be installed on browser)
-    cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem web_csr.json | cfssljson -bare web
+     /Users/paulosilva/go/bin/cfssl gencert -ca root_ca.pem -ca-key root_ca-key.pem web_csr.json |  /Users/paulosilva/go/bin/cfssljson -bare web
     cat web-key.pem web.pem > web_crt.pem
     cat web.pem root_ca.pem > web-bundle.pem
     openssl pkcs12 -inkey web-key.pem -in web-bundle.pem -export -out web.pfx
