@@ -8,7 +8,7 @@ db.getSiblingDB('$external').runCommand(
     createUser: 'OU=mongo_client,O=BIGSEA,L=Coimbra,ST=CB,C=PT',
     roles: [
              { role: 'readWrite', db: 'AAADB' },
-             { role: 'userAdminAnyDatabase', db: 'admin' }
+             { role: 'userAdminAnyDatabase', db: 'AAADB' }
            ],
     writeConcern: { w: 'majority' , wtimeout: 5000 }
   }
